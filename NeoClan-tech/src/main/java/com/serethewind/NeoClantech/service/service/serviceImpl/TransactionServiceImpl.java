@@ -33,11 +33,34 @@ public class TransactionServiceImpl implements TransactionService {
     public List<TransactionDto> fetchTransactionByUser(String accountNumber) {
         List<Transaction> transactionList = transactionRepository.findByAccountNumber(accountNumber);
 
+        if (transactionList.isEmpty()) {
+            return null;
+        }
+
         List<TransactionDto> transactionDtoList = transactionList.stream().map(item -> TransactionDto.builder()
                 .transactionType(item.getTransactionType())
                 .accountNumber(item.getAccountNumber())
                 .amount(item.getAmount())
                 .build()).collect(Collectors.toList());
+
+        return transactionDtoList;
+    }
+
+    @Override
+    public List<TransactionDto> fetchCreditOrDebitTransactionByUser(String accountNumber, String debitOrCredit) {
+        List<Transaction> transactionList = transactionRepository.findByAccountNumber(accountNumber);
+
+        if (transactionList.isEmpty()) {
+            return null;
+        }
+
+        List<TransactionDto> transactionDtoList = transactionList.stream().filter(item -> item.getTransactionType().equalsIgnoreCase(debitOrCredit))
+                .map(item -> TransactionDto.builder()
+                        .transactionType(item.getTransactionType())
+                        .accountNumber(item.getAccountNumber())
+                        .amount(item.getAmount())
+                        .build())
+                .collect(Collectors.toList());
 
         return transactionDtoList;
     }
