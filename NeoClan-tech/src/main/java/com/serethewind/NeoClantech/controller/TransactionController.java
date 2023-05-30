@@ -2,6 +2,7 @@ package com.serethewind.NeoClantech.controller;
 
 import com.serethewind.NeoClantech.dto.TransactionDto;
 import com.serethewind.NeoClantech.service.TransactionService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/transaction")
+//@Tag(
+//        name = "Transaction Service REST APIs/Endpoint",
+//        description = "Endpoints for cheking transaction type"
+//)
 public class TransactionController {
 
     private TransactionService transactionService;

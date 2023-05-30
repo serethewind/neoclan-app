@@ -6,6 +6,12 @@ import com.serethewind.NeoClantech.dto.TransferRequest;
 import com.serethewind.NeoClantech.dto.UserRequest;
 //import com.serethewind.NeoClantech.repository.UserRepository;
 import com.serethewind.NeoClantech.service.UserService;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +21,30 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Spring Boot Banking Application",
+                description = "Spring Boot Banking Application REST APIs Documentation",
+                version = "v1.0",
+                contact = @Contact(
+                        name = "Noah",
+                        email = "osasereu@gmail.com",
+                        url = "https://github.com/serethewind"
+                ),
+                license = @License(
+                        name = "Apache 2.0",
+                        url = "https://github.com/serethewind"
+                )
+        ),
+        externalDocs = @ExternalDocumentation(
+                description = "Spring Boot Banking Application Documentation",
+                url = "https://github.com/serethewind"
+        )
+)
+@Tag(
+        name = "User Account Service REST APIs/Endpoint",
+        description = "Endpoints for manipulating User account"
+)
 public class UserController {
 
     private UserService userService;
