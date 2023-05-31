@@ -255,7 +255,7 @@ public class UserServiceImpl implements UserService {
 
         SMSDetails smsDetails = new SMSDetails();
         smsDetails.setRecipientNumber(receivingUser.getPhoneNumber());
-        smsDetails.setTextBody("NeoClan Tech Transaction Alert [Credit : " + transactionRequest.getAmount() + "]\n Credit transaction of "+ transactionRequest.getAmount() + " has been performed on your account. Your new account balance is " + receivingUser.getAccountBalance());
+        smsDetails.setTextBody("NeoClan Tech Transaction Alert [Credit : " + transactionRequest.getAmount() + "]\n Credit transaction of " + transactionRequest.getAmount() + " has been performed on your account. Your new account balance is " + receivingUser.getAccountBalance());
 
         smsService.sendSMS(smsDetails);
 
@@ -269,7 +269,6 @@ public class UserServiceImpl implements UserService {
                         .build())
                 .build();
     }
-
 
 
     @Override
@@ -379,7 +378,7 @@ public class UserServiceImpl implements UserService {
         User sendingUser = userRepository.findByAccountNumber(transferRequest.getSourceAccountNumber());
         User receivingUser = userRepository.findByAccountNumber(transferRequest.getDestinationAccountNumber());
 
-        if (!userRepository.existsByAccountNumber(transferRequest.getSourceAccountNumber()) || !userRepository.existsByAccountNumber(transferRequest.getDestinationAccountNumber())) {
+        if (!userRepository.existsByAccountNumber(transferRequest.getDestinationAccountNumber())) {
             return Response.builder()
                     .responseCode(ResponseUtils.USER_NOT_FOUND_CODE)
                     .responseMessage(ResponseUtils.USER_NOT_FOUND_MESSAGE)
@@ -387,47 +386,69 @@ public class UserServiceImpl implements UserService {
                     .build();
         }
 
-        if (sendingUser.getAccountBalance().compareTo(transferRequest.getAmount()) == -1) {
-            return Response.builder()
-                    .responseCode(ResponseUtils.USER_BALANCE_ENQUIRY)
-                    .responseMessage(ResponseUtils.ACCOUNT_BALANCE_INSUFFICIENT)
-                    .data(null)
-                    .build();
+        //i want to pass the methods for debit and credit.
+        //create instance of transactionRequest
+
+        TransactionRequest sendingTransactionRequest = new TransactionRequest(sendingUser.getAccountNumber(), transferRequest.getAmount());
+        TransactionRequest receivingTransactionRequest = new TransactionRequest(receivingUser.getAccountNumber(), transferRequest.getAmount());
+
+        Response debitResponse = debitRequest(sendingTransactionRequest);
+
+        if (!debitResponse.getResponseCode().equalsIgnoreCase(ResponseUtils.SUCCESSFUL_TRANSACTION)) {
+            return debitResponse;
         }
+        creditRequest(receivingTransactionRequest);
 
-        sendingUser.setAccountBalance(sendingUser.getAccountBalance().subtract(transferRequest.getAmount()));
-        receivingUser.setAccountBalance(receivingUser.getAccountBalance().add(transferRequest.getAmount()));
-        userRepository.save(sendingUser);
-        userRepository.save(receivingUser);
-
-        TransactionDto debitTransactiondto = TransactionDto.builder()
-                .transactionType("DEBIT")
-                .accountNumber(sendingUser.getAccountNumber())
-                .amount(transferRequest.getAmount())
-                .build();
-
-        TransactionDto creditTransactiondto = TransactionDto.builder()
-                .transactionType("CREDIT")
-                .accountNumber(receivingUser.getAccountNumber())
-                .amount(transferRequest.getAmount())
-                .build();
-
-        EmailDetails emailDetails = new EmailDetails();
-
-        emailDetails.setRecipient(sendingUser.getEmail());
-        emailDetails.setSubject("NeoClan Tech Transaction Alert [Debit : " + transferRequest.getAmount() + "]");
-        emailDetails.setMessageBody("Transfer of " + transferRequest.getAmount() + " to " + receivingUser.getFirstName() + " " + receivingUser.getOtherName() + " " + receivingUser.getLastName() + " is successful.  Your new account balance is " + sendingUser.getAccountBalance());
-
-        emailService.sendSimpleMessage(emailDetails);
-
-        SMSDetails smsDetails = SMSDetails.builder()
-                .recipientNumber(sendingUser.getPhoneNumber())
-                .textBody("NeoClan Tech Transaction Alert [Debit : " + transferRequest.getAmount() + "]\nTransfer of " + transferRequest.getAmount() + " to " + receivingUser.getFirstName() + " " + receivingUser.getOtherName() + " " + receivingUser.getLastName() + " is successful.  Your new account balance is " + sendingUser.getAccountBalance())
-                .build();
-
-        smsService.sendSMS(smsDetails);
-        transactionService.saveTransaction(debitTransactiondto);
-        transactionService.saveTransaction(creditTransactiondto);
+//
+//        if (!userRepository.existsByAccountNumber(transferRequest.getSourceAccountNumber()) || !userRepository.existsByAccountNumber(transferRequest.getDestinationAccountNumber())) {
+//            return Response.builder()
+//                    .responseCode(ResponseUtils.USER_NOT_FOUND_CODE)
+//                    .responseMessage(ResponseUtils.USER_NOT_FOUND_MESSAGE)
+//                    .data(null)
+//                    .build();
+//        }
+//
+//        if (sendingUser.getAccountBalance().compareTo(transferRequest.getAmount()) == -1) {
+//            return Response.builder()
+//                    .responseCode(ResponseUtils.USER_BALANCE_ENQUIRY)
+//                    .responseMessage(ResponseUtils.ACCOUNT_BALANCE_INSUFFICIENT)
+//                    .data(null)
+//                    .build();
+//        }
+//
+//        sendingUser.setAccountBalance(sendingUser.getAccountBalance().subtract(transferRequest.getAmount()));
+//        receivingUser.setAccountBalance(receivingUser.getAccountBalance().add(transferRequest.getAmount()));
+//        userRepository.save(sendingUser);
+//        userRepository.save(receivingUser);
+//
+//        TransactionDto debitTransactiondto = TransactionDto.builder()
+//                .transactionType("DEBIT")
+//                .accountNumber(sendingUser.getAccountNumber())
+//                .amount(transferRequest.getAmount())
+//                .build();
+//
+//        TransactionDto creditTransactiondto = TransactionDto.builder()
+//                .transactionType("CREDIT")
+//                .accountNumber(receivingUser.getAccountNumber())
+//                .amount(transferRequest.getAmount())
+//                .build();
+//
+//        EmailDetails emailDetails = new EmailDetails();
+//
+//        emailDetails.setRecipient(sendingUser.getEmail());
+//        emailDetails.setSubject("NeoClan Tech Transaction Alert [Debit : " + transferRequest.getAmount() + "]");
+//        emailDetails.setMessageBody("Transfer of " + transferRequest.getAmount() + " to " + receivingUser.getFirstName() + " " + receivingUser.getOtherName() + " " + receivingUser.getLastName() + " is successful.  Your new account balance is " + sendingUser.getAccountBalance());
+//
+//        emailService.sendSimpleMessage(emailDetails);
+//
+//        SMSDetails smsDetails = SMSDetails.builder()
+//                .recipientNumber(sendingUser.getPhoneNumber())
+//                .textBody("NeoClan Tech Transaction Alert [Debit : " + transferRequest.getAmount() + "]\nTransfer of " + transferRequest.getAmount() + " to " + receivingUser.getFirstName() + " " + receivingUser.getOtherName() + " " + receivingUser.getLastName() + " is successful.  Your new account balance is " + sendingUser.getAccountBalance())
+//                .build();
+//
+//        smsService.sendSMS(smsDetails);
+//        transactionService.saveTransaction(debitTransactiondto);
+//        transactionService.saveTransaction(creditTransactiondto);
 
         return Response.builder()
                 .responseCode(ResponseUtils.SUCCESSFUL_TRANSACTION)

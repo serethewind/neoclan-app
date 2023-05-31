@@ -29,7 +29,7 @@ public class SmsServiceImpl implements SmsService {
 
 //    VonageClient client = VonageClient.builder().apiKey(apiKey).apiSecret(apiSecret).build();
 
-    VonageClient client = VonageClient.builder().apiKey("5593f55d").apiSecret("w6KdBu6ZgSoNREhwnsvgCTRxJN29DdoIVHTdF6GslYWlYCXQoG").build();
+//    VonageClient client = VonageClient.builder().apiKey("5593f55d").apiSecret("w6KdBu6ZgSoNREhwnsvgCTRxJN29DdoIVHTdF6GslYWlYCXQoG").build();
     @Value("${twilio.accountSid}")
     private String accountSid;
     @Value("${twilio.authToken}")
@@ -48,9 +48,6 @@ public class SmsServiceImpl implements SmsService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to send sms" + e.getMessage());
         }
-
-    }
-}
 //        TextMessage textMessage = new TextMessage("NeoClan Tech", smsDetails.getRecipientNumber(), smsDetails.getTextBody());
 //        try {
 //            SmsSubmissionResponse response = client.getSmsClient().submitMessage(textMessage);
@@ -65,4 +62,7 @@ public class SmsServiceImpl implements SmsService {
 //        } catch (Exception e) {
 //            throw new RuntimeException("Failed to send sms" + e.getMessage());
 //        }
+    }
+}
+
 
