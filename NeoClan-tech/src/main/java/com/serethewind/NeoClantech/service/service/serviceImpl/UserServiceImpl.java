@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
                     .textBody("Congratulations! Your account has been successfully created! Kindly find your details below: \n" + accountDetails)
                     .build();
 
-            smsService.sendSMS(smsDetails);
+//            smsService.sendSMS(smsDetails);
 
             return Response.builder().responseCode(ResponseUtils.SUCCESS).responseMessage(ResponseUtils.USER_REGISTERED_SUCCESS).data(Data.builder()
                             .accountBalance(savedUser.getAccountBalance())
@@ -257,7 +257,7 @@ public class UserServiceImpl implements UserService {
         smsDetails.setRecipientNumber(receivingUser.getPhoneNumber());
         smsDetails.setTextBody("NeoClan Tech Transaction Alert [Credit : " + transactionRequest.getAmount() + "]\n Credit transaction of " + transactionRequest.getAmount() + " has been performed on your account. Your new account balance is " + receivingUser.getAccountBalance());
 
-        smsService.sendSMS(smsDetails);
+//        smsService.sendSMS(smsDetails);
 
         return Response.builder()
                 .responseCode(ResponseUtils.SUCCESSFUL_TRANSACTION)
@@ -312,7 +312,7 @@ public class UserServiceImpl implements UserService {
         smsDetails.setRecipientNumber(user.getPhoneNumber());
         smsDetails.setTextBody("NeoClan Tech Transaction Alert [Debit : " + transactionRequest.getAmount() + "]\nDebit transaction of " + transactionRequest.getAmount() + " has been performed on your account. Your new account balance is " + user.getAccountBalance());
 
-        smsService.sendSMS(smsDetails);
+//        smsService.sendSMS(smsDetails);
 
         emailService.sendSimpleMessage(emailDetails);
 
