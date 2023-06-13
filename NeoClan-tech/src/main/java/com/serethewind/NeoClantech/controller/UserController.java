@@ -53,6 +53,7 @@ public class UserController {
         this.userService = userService;
     }
 
+
     @PostMapping
     public ResponseEntity<Response> registerUser(@RequestBody UserRequest userRequest){
         return  new ResponseEntity<>(userService.registerUser(userRequest), HttpStatus.CREATED)  ;
