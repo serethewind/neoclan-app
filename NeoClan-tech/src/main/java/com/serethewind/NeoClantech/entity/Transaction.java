@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,4 +26,6 @@ public class Transaction {
     private BigDecimal amount;
     @CreationTimestamp
     private LocalDateTime created;
+    @UpdateTimestamp
+    private LocalDateTime modifiedAt;
 }
