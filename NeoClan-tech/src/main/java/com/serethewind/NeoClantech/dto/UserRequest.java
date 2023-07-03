@@ -20,6 +20,7 @@ public class UserRequest {
     private String lastName;
     private String otherName;
     private String gender;
+    private String username;
     private String address;
     private String stateOfOrigin;
 //    private String accountNumber;
@@ -27,6 +28,7 @@ public class UserRequest {
     private String email;
     private String phoneNumber;
     private String alternativePhoneNumber;
+    private String password;
 //    private String status;
     private LocalDate dateOfBirth;
 
