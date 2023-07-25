@@ -1,7 +1,9 @@
 package com.serethewind.NeoClantech.service.service.serviceImpl;
 
 import com.serethewind.NeoClantech.dto.*;
+import com.serethewind.NeoClantech.entity.RoleEntity;
 import com.serethewind.NeoClantech.entity.User;
+import com.serethewind.NeoClantech.repository.RoleRepository;
 import com.serethewind.NeoClantech.repository.UserRepository;
 import com.serethewind.NeoClantech.service.EmailService;
 import com.serethewind.NeoClantech.service.SmsService;
@@ -9,34 +11,32 @@ import com.serethewind.NeoClantech.service.TransactionService;
 import com.serethewind.NeoClantech.service.UserService;
 import com.serethewind.NeoClantech.util.ResponseUtils;
 import jakarta.validation.constraints.Email;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
-
+private RoleRepository roleRepository;
     private UserRepository userRepository;
     private TransactionService transactionService;
     private EmailService emailService;
+    private PasswordEncoder passwordEncoder;
 
     private SmsService smsService;
 
     private ModelMapper modelMapper;
 
-    public UserServiceImpl(UserRepository userRepository, TransactionService transactionService, ModelMapper modelMapper, EmailService emailService, SmsService smsService) {
-        this.userRepository = userRepository;
-        this.transactionService = transactionService;
-        this.modelMapper = modelMapper;
-        this.emailService = emailService;
-        this.smsService = smsService;
-    }
 
     @Override
     public Response registerUser(UserRequest userRequest) {
@@ -47,6 +47,9 @@ public class UserServiceImpl implements UserService {
         if (isEmailExist) {
             return Response.builder().responseCode(ResponseUtils.USER_EXISTS_CODE).responseMessage(ResponseUtils.USER_EXISTS_MESSAGE).data(null).build();
         } else {
+
+            RoleEntity role = roleRepository.findByRolename("ROLE_USER").orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
             User user = User.builder()
                     .firstName(userRequest.getFirstName())
                     .lastName(userRequest.getLastName())
@@ -54,6 +57,7 @@ public class UserServiceImpl implements UserService {
                     .gender(userRequest.getGender())
                     .address(userRequest.getAddress())
                     .stateOfOrigin(userRequest.getStateOfOrigin())
+                    .roles(Collections.singleton(role))
                     .accountNumber(ResponseUtils.generateAccountNumber(ResponseUtils.lengthOfAccountNumber))
                     .accountBalance(userRequest.getAccountBalance())
                     .email(userRequest.getEmail())
@@ -61,6 +65,8 @@ public class UserServiceImpl implements UserService {
                     .alternativePhoneNumber(userRequest.getAlternativePhoneNumber())
                     .status("ACTIVE")
                     .dateOfBirth(userRequest.getDateOfBirth())
+                    .username(userRequest.getUsername())
+                    .password(passwordEncoder.encode(userRequest.getPassword()))
                     .build();
 
             User savedUser = userRepository.save(user);
